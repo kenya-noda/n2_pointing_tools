@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from scipy.optimize import curve_fit
 
+#------
+def gaussian(x, a, mu, gamma):
+    return a * numpy.exp(- gamma * (x - mu) **2) 
 
 #-----
 args = sys.argv
@@ -21,6 +24,7 @@ hdu = fits.open(file_name)
 
 
 # define axis / mask
+mode = hdu[1].data["SOBSMODE"]
 lam = hdu[1].data["LAMDEL"]
 bet = hdu[1].data["BETDEL"]
 subscan = hdu[1].data["SUBSCAN"]
@@ -112,8 +116,8 @@ dEl_pu = popt_el2[1]
 dAz = (dAz_mi + dAz_pu)/2
 dEl = (dEl_mi + dEl_pu)/2
 
-print("dAz_mi =", dAz_mi, "    dAz_pu =", dAz_pu, "    dAz =", dAz, "(arcsec)")
-print("dEl_mi =", dEl_mi, "    dEl_pu =", dEl_pu, "    dEl =", dEl, "(arcsec)")
+print("dAz_mi =", round(dAz_mi, 2), "    dAz_pu =", round(dAz_pu, 2), "    dAz =", round(dAz, 2), "(arcsec)")
+print("dEl_mi =", round(dEl_mi, 2), "    dEl_pu =", round(dEl_pu, 2), "    dEl =", round(dEl, 2), "(arcsec)")
 
 
 # Dif plot
@@ -146,7 +150,6 @@ axlist[3].set_xlabel("dEl [arcsec]")
 axlist[3].set_ylabel("differential [K]")
 
 [a.grid() for a in axlist]
-plt.show()
 
 
 # color image
@@ -162,5 +165,3 @@ fig2.colorbar(im)
 plt.show()
 
 
-def gaussian(x, a, mu, gamma):
-    return a * numpy.exp(- gamma * (x - mu) **2) 

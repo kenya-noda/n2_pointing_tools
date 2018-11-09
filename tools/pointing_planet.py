@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from scipy.optimize import curve_fit
 
+#-------
+def gaussian(x, a, mu, gamma):
+    return a * numpy.exp(- gamma * (x - mu) **2) 
 
 #-----
 args = sys.argv
@@ -25,9 +28,9 @@ para_init = numpy.array([10, 0.1, 0.0001])
 
 # specify option
 if len(args) > 2:
-    if args[2] != None:
+    if args[2] != "DEF":
         integ_mi = int(args[2])
-    if args[3] != None:
+    if args[3] != "DEF":
         integ_ma = int(args[3])
 else: pass
 
@@ -36,6 +39,7 @@ hdu = fits.open(file_name)
 
 
 # define axis / mask
+mode = hdu[1].data["SOBSMODE"]
 lam = hdu[1].data["LAMDEL"]
 bet = hdu[1].data["BETDEL"]
 subscan = hdu[1].data["SUBSCAN"]
@@ -99,10 +103,10 @@ gaus_el = gaussian(x_g, popt_el[0], popt_el[1], popt_el[2])
 # dAz dEl
 dAz = popt_az[1]
 dEl = popt_el[1]
-print("dAz =", dAz, "    dEl =", dEl, "(arcsec)")
+print("dAz =", round(dAz, 2), "    dEl =", round(dEl, 2), "(arcsec)")
 hpbw_az =  1/numpy.sqrt(2*popt_az[2]) *2.35
 hpbw_el = 1/numpy.sqrt(2*popt_el[2]) *2.35
-print("HPBW_AZ =", hpbw_az, "     HPBW_EL =", hpbw_el)
+print("HPBW_AZ =", round(hpbw_az, 2), "     HPBW_EL =", round(hpbw_el, 2))
 
 
 # plot
@@ -127,5 +131,3 @@ axlist[1].set_ylabel("Ta* [K]")
 plt.show()
 
 
-def gaussian(x, a, mu, gamma):
-    return a * numpy.exp(- gamma * (x - mu) **2) 

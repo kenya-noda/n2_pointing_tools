@@ -7,6 +7,12 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from scipy.optimize import curve_fit
 
+#-----
+def f(x, a, b, c):
+    return a*x**2 + b*x + c
+
+def gaussian(x, a, mu, gamma):
+    return a * numpy.exp(- gamma * (x - mu) **2)
 
 #-----
 args = sys.argv
@@ -29,15 +35,15 @@ para_init = numpy.array([25000., 0.1, 0.0001])
 # specify option
 if len(args) > 2:
     # for baseline fitting to avoid spurious
-    if args[2] != None:
+    if args[2] != "DEF":
         mi = int(args[2])
-    if args[3] != None:
+    if args[3] != "DEF":
         ma = int(args[3])
-    if args[4] != None:
+    if args[4] != "DEF":
         width = int(args[4])
-    if args[5] != None:
+    if args[5] != "DEF":
         integ_mi = int(args[5])
-    if args[6] != None:
+    if args[6] != "DEF":
         integ_ma = int(args[6])
 else: pass
 
@@ -46,6 +52,7 @@ hdu = fits.open(file_name)
 
 
 # define axis / mask
+mode = hdu[1].data["SOBSMODE"]
 lam = hdu[1].data["LAMDEL"]
 bet = hdu[1].data["BETDEL"]
 subscan = hdu[1].data["SUBSCAN"]
@@ -90,7 +97,7 @@ for i in range(len(Taslist)):
     param = numpy.polyfit(x[:16384-dif], base, 2)
     rTas = Taslist[i] - f(x, *param)
     rTaslist_tmp.append(rTas)
-rTaslist = numpy.array(rTaslist)
+rTaslist = numpy.array(rTaslist_tmp)
 
 
 # create data for plot
@@ -161,7 +168,6 @@ axlist[1].set_xlabel("dEl [arcsec]")
 axlist[1].set_ylabel("Ta* [K]")
 
 [a.grid() for a in axlist]
-plt.show()
 
 
 fig2 = plt.figure(figsize = (20,20))
@@ -246,8 +252,3 @@ axlist[24].set_visible(False)
 plt.show()
 
 
-def f(x, a, b, c):
-    return a*x**2 + b*x + c
-
-def gaussian(x, a, mu, gamma):
-    return a * numpy.exp(- gamma * (x - mu) **2)
