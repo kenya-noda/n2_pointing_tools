@@ -33,7 +33,7 @@ integ_ma = int(15000)
 para_init = numpy.array([25000., 0.1, 0.0001])
 
 # specify option
-if len(args) > 2:
+if len(args) == 7:
     # for baseline fitting to avoid spurious
     if args[2] != "DEF":
         mi = int(args[2])

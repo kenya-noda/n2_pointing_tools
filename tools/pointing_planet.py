@@ -27,7 +27,7 @@ integ_ma = int(15000)
 para_init = numpy.array([10, 0.1, 0.0001])
 
 # specify option
-if len(args) > 2:
+if len(args) == 4:
     if args[2] != "DEF":
         integ_mi = int(args[2])
     if args[3] != "DEF":
