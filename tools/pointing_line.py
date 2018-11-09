@@ -143,10 +143,8 @@ gaus_el = gaussian(x_g, popt_el[0], popt_el[1], popt_el[2])
 # dAz dEl
 dAz = popt_az[1]
 dEl = popt_el[1]
-print("dAz =", round(dAz, 2), "    dEl =", round(dEl, 2), "(arcsec)")
 hpbw_az =  1/numpy.sqrt(2*popt_az[2]) *2.35
 hpbw_el = 1/numpy.sqrt(2*popt_el[2]) *2.35
-print("HPBW_AZ =", round(hpbw_az, 2), "     HPBW_EL =", round(hpbw_el, 2))
 
 
 # plot
@@ -248,6 +246,11 @@ axlist[20].set_visible(False)
 axlist[21].set_visible(False)
 axlist[23].set_visible(False)
 axlist[24].set_visible(False)
+
+plt.axes([0.625,0.25, 0.25, 0.1])
+plt.axis("off")
+plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "               dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 18)
+plt.text(0,-0.5,"HPBW_AZ = {}".format(round(hpbw_az, 2)) + "  HPBW_EL = {}".format(round(hpbw_el, 2)), fontsize = 18)
 
 plt.show()
 

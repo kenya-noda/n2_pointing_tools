@@ -116,14 +116,11 @@ dEl_pu = popt_el2[1]
 dAz = (dAz_mi + dAz_pu)/2
 dEl = (dEl_mi + dEl_pu)/2
 
-print("dAz_mi =", round(dAz_mi, 2), "    dAz_pu =", round(dAz_pu, 2), "    dAz =", round(dAz, 2), "(arcsec)")
-print("dEl_mi =", round(dEl_mi, 2), "    dEl_pu =", round(dEl_pu, 2), "    dEl =", round(dEl, 2), "(arcsec)")
-
 
 # Dif plot
 fig = plt.figure(figsize = (18, 8))
 
-axlist = [fig.add_subplot(2,2,i+1) for i in range(4)]
+axlist = [fig.add_subplot(3,2,i+1) for i in range(6)]
 
 axlist[0].plot(xscan_x, xscan_Ta, "o")
 axlist[0].vlines(dAz_mi, 0, 300, linestyle = "dashed")
@@ -148,6 +145,13 @@ axlist[3].plot(x_el[:1000], gaus_el1, color="k")
 axlist[3].plot(x_el[1000:], gaus_el2, color="k")
 axlist[3].set_xlabel("dEl [arcsec]")
 axlist[3].set_ylabel("differential [K]")
+
+axlist[4].set_visible(False)
+axlist[5].set_visible(False)
+
+plt.axes([0.45,0.28, 0.25, 0.2])
+plt.axis("off")
+plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "              dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 18)
 
 [a.grid() for a in axlist]
 

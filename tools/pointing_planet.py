@@ -103,17 +103,15 @@ gaus_el = gaussian(x_g, popt_el[0], popt_el[1], popt_el[2])
 # dAz dEl
 dAz = popt_az[1]
 dEl = popt_el[1]
-print("dAz =", round(dAz, 2), "    dEl =", round(dEl, 2), "(arcsec)")
 hpbw_az =  1/numpy.sqrt(2*popt_az[2]) *2.35
 hpbw_el = 1/numpy.sqrt(2*popt_el[2]) *2.35
-print("HPBW_AZ =", round(hpbw_az, 2), "     HPBW_EL =", round(hpbw_el, 2))
 
 
 # plot
 
 fig = plt.figure(figsize = (15, 5))
 
-axlist = [fig.add_subplot(1,2,i+1) for i in range(2)]
+axlist = [fig.add_subplot(2,2,i+1) for i in range(4)]
 
 axlist[0].plot(xscan_x, xscan_integ, "o")
 axlist[0].errorbar(xscan_x, xscan_integ, yerr = error_az[0], fmt = "b+")
@@ -126,6 +124,14 @@ axlist[1].errorbar(yscan_y, yscan_integ, yerr = error_el[0], fmt = "b+")
 axlist[1].plot(x_g, gaus_el)
 axlist[1].set_xlabel("dEl [arcsec]")
 axlist[1].set_ylabel("Ta* [K]")
+
+axlist[2].set_visible(False)
+axlist[3].set_visible(False)
+
+plt.axes([0.55,0.25, 0.25, 0.2])
+plt.axis("off")
+plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "              dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 18)
+plt.text(0,-0.2,"HPBW_AZ = {}".format(round(hpbw_az, 2)) + "      HPBW_EL = {}".format(round(hpbw_el, 2)), fontsize = 18)
 
 [a.grid() for a in axlist]
 plt.show()
