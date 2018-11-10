@@ -34,21 +34,27 @@ def analysis(file_name, integ_mi=3000, integ_ma=15000):
     ymask = (subscan == 2) & onmask
 
 
+# get index
+    ind_hot = numpy.where(hotmask == True)
+    ind_list_hot = [ind_hot[0][i] for i in range(len(ind_hot[0]))]
+
+    ind_off = numpy.where(offmask == True)
+    ind_list_off = [ind_off[0][i] for i in range(len(ind_off[0]))]
+
 # calc Ta*
     data = hdu[1].data["DATA"]
 
-    HOT = data[hotmask]
-    HOTlist = numpy.array([HOT[0] for i in range(len(hotmask))])
+    HOTlist = numpy.zeros((len(hotmask),16384))
+    for i in range(len(ind_list_hot)-1):
+        HOTlist[ind_list_hot[i]:ind_list_hot[i+1]] = data[ind_list_hot[i]]
+    HOTlist[ind_list_hot[-1]:(len(hotmask))] = data[ind_list_hot[-1]]
 
-    tmp = []
-    OFF = data[offmask]
-    tmp.append(OFF[0])
-    for i in range(numpy.sum(offmask)):
-        tmp.extend([OFF[i] for j in range(int(len(offmask)/numpy.sum(offmask)))])
-    tmp.append(OFF[numpy.sum(offmask) -1])
-    OFFlist = numpy.array(tmp)   
+    OFFlist = numpy.zeros((len(offmask),16384))
+    for i in range(len(ind_list_off)-1):
+        OFFlist[ind_list_off[i]:ind_list_off[i+1]] = data[ind_list_off[i]]
+    OFFlist[ind_list_off[-1]:(len(offmask))] = data[ind_list_off[-1]]
 
-    ONlist = data
+    ONlist = numpy.array(data)
 
     Taslist = (ONlist - OFFlist)/(HOTlist - OFFlist) * 300
 

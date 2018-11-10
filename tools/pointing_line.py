@@ -34,20 +34,28 @@ def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=3000, integ_ma=15
     ymask = (subscan == 2) & onmask
 
 
+# get index
+    ind_hot = numpy.where(hotmask == True)
+    ind_list_hot = [ind_hot[0][i] for i in range(len(ind_hot[0]))]
+
+    ind_off = numpy.where(offmask == True)
+    ind_list_off = [ind_off[0][i] for i in range(len(ind_off[0]))]
+
+
 # calc Ta*
     data = hdu[1].data["DATA"]
 
-    HOT = data[hotmask]
-    HOTlist = numpy.array([HOT[0] for i in range(len(hotmask))])
+    HOTlist = numpy.zeros((len(hotmask),16384))
+    for i in range(len(ind_list_hot)-1):
+        HOTlist[ind_list_hot[i]:ind_list_hot[i+1]] = data[ind_list_hot[i]]
+    HOTlist[ind_list_hot[-1]:(len(hotmask))] = data[ind_list_hot[-1]]
 
-    tmp = []
-    OFF = data[offmask]
-    tmp.append(OFF[0])
-    for i in range(numpy.sum(offmask)):
-        tmp.extend([OFF[i] for j in range(int(len(offmask)/numpy.sum(offmask)))])
-    OFFlist = numpy.array(tmp)   
+    OFFlist = numpy.zeros((len(offmask),16384))
+    for i in range(len(ind_list_off)-1):
+        OFFlist[ind_list_off[i]:ind_list_off[i+1]] = data[ind_list_off[i]]
+    OFFlist[ind_list_off[-1]:(len(offmask))] = data[ind_list_off[-1]]
 
-    ONlist = data
+    ONlist = numpy.array(data)
 
     Taslist = (ONlist - OFFlist)/(HOTlist - OFFlist) * 300
 
@@ -139,9 +147,11 @@ def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=3000, integ_ma=15
 
 
     fig2 = plt.figure(figsize = (20,20))
+    
+    index_max = numpy.argmax(xscan_Ta[2][4000:12000]) + 4000 
 
-    lim_mi = int(7500)
-    lim_ma = int(8500)
+    lim_mi = int(index_max - 800)
+    lim_ma = int(index_max + 800)
 
     axlist = [fig2.add_subplot(5,5,i+1) for i in range(25)]
 
