@@ -16,7 +16,7 @@ def gaussian(x, a, mu, gamma):
 
 para_init = numpy.array([25000., 0.1, 0.0001])
     #-----
-def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=3000, integ_ma=15000):
+def analysis(file_name, mi=int(5000), ma=int(15000), width=int(500), integ_mi=int(8000), integ_ma=int(9000)):
 # open file
     hdu = fits.open(file_name)
 
@@ -67,8 +67,8 @@ def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=3000, integ_ma=15
     rtmp = []
     for i in range(len(Taslist)):
         base = []
-        start = numpy.argmax(Taslist[i][mi:ma]) + (mi - width)
-        end = numpy.argmax(Taslist[i][mi:ma]) + (mi + width)
+        start = numpy.argmax(Taslist[i][int(mi):int(ma)]) + (mi - width)
+        end = numpy.argmax(Taslist[i][int(mi):int(ma)]) + (mi + width)
         dif = end - start
         base.extend(Taslist[i])
         base[start:end] = []
@@ -99,20 +99,20 @@ def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=3000, integ_ma=15
 
 
 # TA* integration
-    xscan_integ = numpy.sum(xscan_Ta[:, integ_mi:integ_ma], axis=1)
-    yscan_integ = numpy.sum(yscan_Ta[:, integ_mi:integ_ma], axis=1)
+    xscan_integ = numpy.sum(xscan_Ta[:, int(integ_mi):int(integ_ma)], axis=1)
+    yscan_integ = numpy.sum(yscan_Ta[:, int(integ_mi):int(integ_ma)], axis=1)
 
 
 # Gaussian Fitting function
 # Az fitting
-    popt_az, pcov_az = curve_fit(gaussian, xscan_x, xscan_integ, p0 = para_init)
+    popt_az, pcov_az = curve_fit(gaussian, xscan_x, xscan_integ, p0 = para_init, maxfev=10000)
     error_az = numpy.sqrt(numpy.diag(pcov_az))
 
     x_g = numpy.linspace(xscan_x[0], xscan_x[-1], 1001)
     gaus_az = gaussian(x_g, popt_az[0], popt_az[1], popt_az[2])
 
 # El fitting
-    popt_el, pcov_el = curve_fit(gaussian, yscan_y, yscan_integ, p0 = para_init)
+    popt_el, pcov_el = curve_fit(gaussian, yscan_y, yscan_integ, p0 = para_init, maxfev=10000)
     error_el = numpy.sqrt(numpy.diag(pcov_el))
 
     gaus_el = gaussian(x_g, popt_el[0], popt_el[1], popt_el[2])
@@ -229,8 +229,10 @@ def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=3000, integ_ma=15
 
     plt.axes([0.625,0.25, 0.25, 0.1])
     plt.axis("off")
-    plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "               dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 18)
-    plt.text(0,-0.5,"HPBW_AZ = {}".format(round(hpbw_az, 2)) + "  HPBW_EL = {}".format(round(hpbw_el, 2)), fontsize = 18)
+    plt.text(0, 0.5, "OBJECT :   {}".format(hdu[1].data["OBJECT"][0]), fontsize=10)
+    plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "               dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 10)
+    plt.text(0,-0.5,"HPBW_AZ = {}".format(round(hpbw_az, 2)) + "  HPBW_EL = {}".format(round(hpbw_el, 2)), fontsize = 10)
+    plt.text(0, -1.0, "DATA PATH :   {}".format(file_name), fontsize=6)
 
     plt.show()
     return
@@ -248,8 +250,8 @@ if __name__ == "__main__":
     ma = int(15000) 
     width = int(500)
 # integration range
-    integ_mi = int(3000)
-    integ_ma = int(15000)
+    integ_mi = int(8000)
+    integ_ma = int(9000)
 # specify option
     if len(args) == 7:
         # for baseline fitting to avoid spurious

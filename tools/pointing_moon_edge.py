@@ -7,12 +7,15 @@ import matplotlib.pyplot as plt
 from astropy.io import fits
 from scipy.optimize import curve_fit
 
+
+para_init1 = numpy.array([75, -1000, 0.0001])###
+para_init2 = numpy.array([-75, 1000, 0.0001])###
 #------
 def gaussian(x, a, mu, gamma):
     return a * numpy.exp(- gamma * (x - mu) **2) 
 
 #-----
-def analysis(file_name):
+def analysis(file_name, integ_mi=int(5000), integ_ma=int(10000)):
 # open file
     hdu = fits.open(file_name)
 
@@ -30,7 +33,7 @@ def analysis(file_name):
 
 
 # calc Ta*
-    integlist = numpy.sum(hdu[1].data["DATA"][:, 3000:15000], axis = 1) ##TODO change range
+    integlist = numpy.sum(hdu[1].data["DATA"][:, int(integ_mi):int(integ_ma)], axis = 1) ##TODO change range
 
     tmp = []
     HOT = integlist[hotmask]
@@ -61,6 +64,17 @@ def analysis(file_name):
     yscan_y= bet[ymask]
 
 
+# color image
+    fig = plt.figure()
+
+    ax = fig.add_subplot(1,1,1, aspect = 1)
+
+    im = ax.scatter(xscan_x, xscan_y, c = xscan_Ta, vmin = 0, vmax = 280)
+    ax.scatter(yscan_x, yscan_y, c = yscan_Ta, vmin = 0, vmax = 280)
+
+    fig.colorbar(im)
+
+
 # Differential function
     xscan_tmp = numpy.roll(xscan_Ta,1)
     xscan_tmp[0] = 0
@@ -73,8 +87,6 @@ def analysis(file_name):
 
 # Gaussian Fitting function add errorbar
     x_az = numpy.linspace(xscan_x[0], xscan_x[-1], 2000)
-    para_init1 = numpy.array([75, -1000, 0.0001])###
-    para_init2 = numpy.array([-75, 1000, 0.0001])###
 
 # dAz fitting
     popt_az1, pcov_az1 = curve_fit(gaussian, xscan_x[:21], xscan_dif[:21], p0 = para_init1)
@@ -109,9 +121,9 @@ def analysis(file_name):
 
 
 # Dif plot
-    fig = plt.figure(figsize = (18, 8))
+    fig2 = plt.figure(figsize = (18, 8))
 
-    axlist = [fig.add_subplot(3,2,i+1) for i in range(6)]
+    axlist = [fig2.add_subplot(3,2,i+1) for i in range(6)]
 
     axlist[0].plot(xscan_x, xscan_Ta, "o")
     axlist[0].vlines(dAz_mi, 0, 300, linestyle = "dashed")
@@ -142,20 +154,11 @@ def analysis(file_name):
 
     plt.axes([0.45,0.28, 0.25, 0.2])
     plt.axis("off")
-    plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "              dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 18)
+    plt.text(0,0,"dAz = {}".format(round(dAz, 2)) + "              dEl = {}".format(round(dEl, 2)) + "   (arcsec)", fontsize = 16)
+    plt.text(0, -0.3, "DATA PATH :   {}".format(file_name), fontsize=10)
 
     [a.grid() for a in axlist]
 
-
-# color image
-    fig2 = plt.figure()
-
-    ax = fig2.add_subplot(1,1,1, aspect = 1)
-
-    im = ax.scatter(xscan_x, xscan_y, c = xscan_Ta, vmin = 0, vmax = 280)
-    ax.scatter(yscan_x, yscan_y, c = yscan_Ta, vmin = 0, vmax = 280)
-
-    fig2.colorbar(im)
 
     plt.show()
 
@@ -168,4 +171,17 @@ if __name__ =="__main__":
         sys.exit()
     file_name = args[1]
 
-    analysis(file_name)
+# option
+# integration range
+    integ_mi = int(5000)
+    integ_ma = int(10000)
+
+# specify option
+    if len(args) == 4:
+        if args[2] != "DEF":
+            integ_mi = int(args[2])
+        if args[3] != "DEF":
+            integ_ma = int(args[3])
+    else: pass
+
+    analysis(file_name, integ_mi, integ_ma)
