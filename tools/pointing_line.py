@@ -16,7 +16,7 @@ def gaussian(x, a, mu, gamma):
 
 para_init = numpy.array([25000., 0.1, 0.0001])
     #-----
-def analysis(file_name, mi=int(5000), ma=int(15000), width=int(500), integ_mi=int(8000), integ_ma=int(9000)):
+def analysis(file_name, mi=5000, ma=15000, width=500, integ_mi=8000, integ_ma=9000):
 # open file
     hdu = fits.open(file_name)
 
@@ -67,8 +67,8 @@ def analysis(file_name, mi=int(5000), ma=int(15000), width=int(500), integ_mi=in
     rtmp = []
     for i in range(len(Taslist)):
         base = []
-        start = numpy.argmax(Taslist[i][int(mi):int(ma)]) + (mi - width)
-        end = numpy.argmax(Taslist[i][int(mi):int(ma)]) + (mi + width)
+        start = int(numpy.argmax(Taslist[i][int(mi):int(ma)]) + (mi - width))
+        end = int(numpy.argmax(Taslist[i][int(mi):int(ma)]) + (mi + width))
         dif = end - start
         base.extend(Taslist[i])
         base[start:end] = []
